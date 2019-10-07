@@ -18,18 +18,30 @@ class Loader(BaseLoader):
         template_name = self.prepare_template_name(template_name)
         for loader in self.template_source_loaders:
             if hasattr(loader, 'get_template_sources'):
-                try:
-                    for result in loader.get_template_sources(template_name, template_dirs):
-                        yield result
-                except UnicodeDecodeError:
-                    # The template dir name was a bytestring that wasn't valid UTF-8.
-                    raise
-                except ValueError:
-                    # The joined path was located outside of this particular
-                    # template_dir (it might be inside another one, so this isn't
-                    # fatal).
-                    pass
-
+                if template_dirs:
+                    try:
+                        for result in loader.get_template_sources(template_name, template_dirs):
+                            yield result
+                    except UnicodeDecodeError:
+                        # The template dir name was a bytestring that wasn't valid UTF-8.
+                        raise
+                    except ValueError:
+                        # The joined path was located outside of this particular
+                        # template_dir (it might be inside another one, so this isn't
+                        # fatal).
+                        pass
+                else:
+                    try:
+                        for result in loader.get_template_sources(template_name):
+                            yield result
+                    except UnicodeDecodeError:
+                        # The template dir name was a bytestring that wasn't valid UTF-8.
+                        raise
+                    except ValueError:
+                        # The joined path was located outside of this particular
+                        # template_dir (it might be inside another one, so this isn't
+                        # fatal).
+                        pass
     def prepare_template_name(self, template_name):
         template_name = u'%s/%s' % (get_flavour(), template_name)
         if settings.FLAVOURS_TEMPLATE_PREFIX:
