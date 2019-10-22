@@ -91,7 +91,7 @@ class CachedLoader(DjangoCachedLoader):
             if template_dirs:
                 key = '-'.join([
                     template_name,
-                    hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()
+                    hashlib.sha1(force_bytes('|'.join(template_dirs.__str__()))).hexdigest()
                 ])
             else:
                 key = template_name
